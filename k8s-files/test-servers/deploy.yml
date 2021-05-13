@@ -1,0 +1,40 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: test-server
+  labels:
+    app: test-server
+spec:
+  type: LoadBalancer
+  selector:
+    app: test-server
+  ports:
+    - name: "http-port"
+      protocol: "TCP"
+      port: 5000
+      targetPort: 5000
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: test-server
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: test-server
+  template:
+    metadata:
+      labels:
+        app: test-server
+    spec:
+      containers:
+      - name: test-server
+        image: komasshu/test-server
+        ports:
+        - containerPort: 5000
+        command: ['node', '/app/app.js']
+        imagePullPolicy: Always
+        env:
+        - name: PORT
+          value: "5000"
